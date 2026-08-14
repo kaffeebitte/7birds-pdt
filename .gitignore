@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+build/
+
+# Logs
+logs/
+*.log
+
+# Editor & AI Assistant directories
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.claude/
+.windsurf/
+.cursor/
+.agents/
+
+# OS files
+.DS_Store
+Thumbs.db

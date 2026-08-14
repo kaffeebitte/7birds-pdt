@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Prisma generated client
+src/generated/prisma/
+generated/prisma/
+
+# Real seed data (contains private information)
+prisma/seed.ts
+
+# Build outputs & TypeScript
+dist/
+build/
+*.tsbuildinfo
+
+# Temporary upload directories
+uploads/
+temp/
+tmp/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Editor & AI Assistant directories
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.claude/
+.windsurf/
+.cursor/
+.agents/
+skills-lock.json
+
+# OS files
+.DS_Store
+Thumbs.db
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

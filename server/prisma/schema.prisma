@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+model User {
+  id String @id @default(cuid())
+
+  passwordHash String
+
+  role Role @default(MEMBER)
+
+  member Member?
+  
+  albums Album[]
+
+  photos Photo[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Member {
+  id String @id @default(cuid())
+  
+  userId String @unique
+  
+  user User @relation(fields: [userId], references: [id])
+
+  slug String @unique
+  
+  displayName String
+
+  avatarUrl String?
+
+  bio String?
+
+  birthday DateTime?
+
+  instagram String?
+
+  spotifyUrl String?
+
+  elements Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Album {
+  id String @id @default(cuid())
+
+  title String
+
+  description String?
+  
+  coverPhotoId String?
+
+  coverPhoto Photo? @relation("AlbumCoverPhoto", fields: [coverPhotoId], references: [id])
+
+  photos Photo[] @relation("AlbumPhotos")
+
+  eventDate DateTime?
+
+  createdByUserId String
+  
+  createdBy User @relation(fields: [createdByUserId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Photo {
+  id String @id @default(cuid())
+  
+  albumId String
+  
+  album Album @relation("AlbumPhotos", fields: [albumId], references: [id])
+  
+  coverOf Album[] @relation("AlbumCoverPhoto")
+  
+  uploadedByUserId String
+  
+  uploadedBy User @relation(fields: [uploadedByUserId], references: [id])
+  
+  imageUrl String
+
+  caption String?
+
+  posX Int @default(0)
+  
+  posY Int @default(0)
+  
+  rotation Float @default(0)
+  
+  width Int @default(250)
+  
+  zIndex Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Calendar {
+  id String @id @default(cuid())
+  
+  title String
+
+  description String?
+
+  year Int
+
+  previewUrl String
+
+  fileUrl String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
