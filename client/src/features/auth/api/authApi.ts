@@ -7,7 +7,7 @@ export type Member = {
   userId: string;
   slug: string;
   displayName: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
   bio: string | null;
   birthday: string | null;
   instagram: string | null;
