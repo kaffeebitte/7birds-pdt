@@ -8,6 +8,23 @@ type LoginInput = {
   password: string;
 };
 
+export async function getLoginOptions() {
+  const members = await prisma.member.findMany({
+    select: {
+      userId: true,
+      slug: true,
+      avatarUrl: true,
+    },
+    orderBy: {
+      slug: "asc",
+    },
+  });
+
+  return {
+    members,
+  };
+}
+
 export async function login({ userId, password }: LoginInput) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
