@@ -23,6 +23,12 @@ export type AuthUser = {
   member: Member | null;
 };
 
+export type LoginOption = {
+  userId: string;
+  slug: string;
+  avatarUrl: string;
+};
+
 type ApiResponse<T> = {
   success: boolean;
   data: T;
@@ -37,6 +43,14 @@ export type LoginResult = {
   token: string;
   user: AuthUser;
 };
+
+export async function getLoginOptions() {
+  const response = await api.get<ApiResponse<{ members: LoginOption[] }>>(
+    "/auth/login-options",
+  );
+
+  return response.data.data.members;
+}
 
 export async function login(input: LoginInput) {
   const response = await api.post<ApiResponse<LoginResult>>(

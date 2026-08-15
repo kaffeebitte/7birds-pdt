@@ -9,19 +9,32 @@ type LoginInput = {
 };
 
 export async function getLoginOptions() {
-  const members = await prisma.member.findMany({
+  const users = await prisma.user.findMany({
+    where: {
+      member: {
+        isNot: null,
+      },
+    },
     select: {
-      userId: true,
-      slug: true,
+      id: true,
       avatarUrl: true,
+      member: {
+        select: {
+          slug: true,
+        },
+      },
     },
     orderBy: {
-      slug: "asc",
+      member: { slug: "asc" },
     },
   });
 
   return {
-    members,
+    members: users.map((user) => ({
+      userId: user.id,
+      slug: user.member!.slug,
+      avatarUrl: user.avatarUrl,
+    })),
   };
 }
 

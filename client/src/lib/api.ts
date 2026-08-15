@@ -22,8 +22,7 @@ api.interceptors.request.use((config) => {
   const token = getStoredToken();
 
   if (token) {
-    config.headers = config.headers ?? {};
-    (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+    config.headers.set("Authorization", `Bearer ${token}`);
   }
 
   return config;
