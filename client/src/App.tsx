@@ -13,7 +13,7 @@ import { NotFoundPage } from "./pages/NotFoundPage";
 
 function App() {
   const user = useAuthStore((state) => state.user);
-  // rút 2 giá trị cần thiết từ zustand store (checkAuth và isCheckingAuth)
+  // Pull required values from the auth store (checkAuth and isCheckingAuth)
   const checkAuth = useAuthStore((state) => state.checkAuth);
   const isCheckingAuth = useAuthStore((state) => state.isCheckingAuth);
 
