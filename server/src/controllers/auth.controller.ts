@@ -8,9 +8,9 @@ export async function login(req: Request, res: Response) {
   const { userId, password } = req.body;
 
   if (
-    typeof userId != "string" ||
+    typeof userId !== "string" ||
     !userId.trim() ||
-    typeof password != "string" ||
+    typeof password !== "string" ||
     !password
   ) {
     return res.status(400).json({
