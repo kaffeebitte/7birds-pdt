@@ -2,7 +2,28 @@ import { prisma } from "../lib/prisma.js";
 import { serializeUser } from "../utils/serializeUser.js";
 import type { Request, Response } from "express";
 import type { AuthenticatedRequest } from "../middlewares/auth.middleware.js";
-import { login as loginUser } from "../services/auth.service.js";
+import {
+  getLoginOptions as getLoginOptionsService,
+  login as loginUser,
+} from "../services/auth.service.js";
+
+export async function getLoginOptions(req: Request, res: Response) {
+  try {
+    const result = await getLoginOptionsService();
+
+    return res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load login options",
+    });
+  }
+}
 
 export async function login(req: Request, res: Response) {
   const { userId, password } = req.body;

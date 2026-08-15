@@ -11,6 +11,8 @@ type AuthState = {
   checkAuth: () => Promise<void>;
   login: (input: LoginInput) => Promise<boolean>;
   logout: () => void;
+  setLoginError: (message: string) => void;
+  clearLoginError: () => void;
 };
 
 function getErrorMessage(error: unknown) {
@@ -101,5 +103,13 @@ export const useAuthStore = create<AuthState>((set) => ({
       user: null,
       loginError: null,
     });
+  },
+
+  setLoginError: (message) => {
+    set({ loginError: message });
+  },
+
+  clearLoginError: () => {
+    set({ loginError: null });
   },
 }));
