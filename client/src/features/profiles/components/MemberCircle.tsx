@@ -36,7 +36,7 @@ export function MemberCircle({
       <img
         src={avatarUrl}
         alt={displayName}
-        className="h-[120px] md:h-[180px] lg:h-[280px] object-contain"
+        className="h-[120px] md:h-[160px] lg:h-[240px] object-contain"
       />
       <span
         className="absolute font-body home-link text-bird-blue whitespace-nowrap"
@@ -46,7 +46,7 @@ export function MemberCircle({
           transform: "translate(-50%, -50%)",
         }}
       >
-        {displayName}
+        {slug}
       </span>
     </Link>
   );

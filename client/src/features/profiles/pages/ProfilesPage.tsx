@@ -1,11 +1,24 @@
 import { BrandLogo } from "../../../shared/components/BrandLogo";
 import { ProfileCircle } from "../components/ProfileOrbit";
-import { mockProfiles } from "../data/mockProfiles";
+import { useProfiles } from "../hooks/useProfiles";
+import { LoadingScreen } from "../../../shared/components/LoadingScreen";
+import { mapProfile } from "../utils/mapProfiles";
 
 export function ProfilesPage() {
+  const { data: profiles, isLoading, error } = useProfiles();
+  const members = mapProfile(profiles ?? []);
+
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  if (error) {
+    return <div>Failed to load profiles</div>;
+  }
+
   return (
     <main className="relative min-h-screen">
-      <ProfileCircle members={mockProfiles} />
+      <ProfileCircle members={members} />
 
       <div className="absolute bottom-32 left-16">
         <h1
