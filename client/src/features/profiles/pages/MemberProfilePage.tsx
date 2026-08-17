@@ -9,11 +9,14 @@ import { ProfileSpotify } from "../components/profile-page/ProfileSpotify";
 import { ProfileIdentity } from "../components/profile-page/ProfileIdentity";
 import { ProfileBirthday } from "../components/profile-page/ProfileBirthday";
 import { ProfileName } from "../components/profile-page/ProfileName";
+import { ProfileEditButton } from "../components/profile-page/ProfileEditButton";
+import { useAuthStore } from "../../auth/store/authStore";
 
 export function MemberProfilePage() {
   const { slug } = useParams();
 
   const { data: profile, isLoading, isError } = useProfile(slug ?? "");
+  const authUser = useAuthStore((state) => state.user);
 
   if (isLoading) {
     return <LoadingScreen />;
@@ -27,6 +30,8 @@ export function MemberProfilePage() {
     return <div>Profile not found</div>;
   }
 
+  const isOwner = authUser?.id === profile.userId;
+
   return (
     <ProfileCanvas>
       <BackButton />
@@ -35,6 +40,7 @@ export function MemberProfilePage() {
       <ProfileIdentity profile={profile} />
       <ProfileBirthday profile={profile} />
       <ProfileName profile={profile} />
+      {isOwner && <ProfileEditButton />}
       <BrandLogo />
     </ProfileCanvas>
   );

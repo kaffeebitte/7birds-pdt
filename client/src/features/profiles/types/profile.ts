@@ -6,6 +6,7 @@ export type ProfileSummary = {
 
 export type ProfileDetail = {
   id: string;
+  userId: string;
   slug: string;
   displayName: string;
   avatarUrl: string;
