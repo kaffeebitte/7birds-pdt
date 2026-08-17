@@ -2,9 +2,18 @@ import type { Request, Response } from "express";
 import { findMembers, findMemberBySlug } from "../services/member.service.js";
 
 export async function getMembers(req: Request, res: Response) {
-  const members = await findMembers();
+  try {
+    const members = await findMembers();
 
-  res.json(members);
+    return res.json(members);
+  } catch (error) {
+    console.error("Get members error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load members",
+    });
+  }
 }
 
 export async function getMemberBySlug(req: Request, res: Response) {
