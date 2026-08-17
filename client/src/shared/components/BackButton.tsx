@@ -6,6 +6,7 @@ export function BackButton() {
 
   return (
     <button
+      type="button"
       onClick={() => navigate(-1)}
       className="absolute
         top-10
