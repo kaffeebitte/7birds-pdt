@@ -11,7 +11,7 @@ export function ProfileInstagram({ profile }: ProfileInstagramProps) {
     <a
       href={`https://instagram.com/${profile.instagram}`}
       target="_blank"
-      rel="noreferer"
+      rel="noopener noreferrer"
       className="
       absolute
       top-28
