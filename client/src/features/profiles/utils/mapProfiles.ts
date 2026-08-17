@@ -1,10 +1,17 @@
 import { profileLayout } from "../data/profileLayout";
-import type { ProfileSummary } from "../api/profileApi";
+import type { ProfileSummary } from "../types/profile";
 
 export function mapProfile(profiles: ProfileSummary[]) {
-  return profiles.map((profile) => ({
-    ...profile,
-    position: profileLayout[profile.slug]?.position,
-    namePosition: profileLayout[profile.slug]?.namePosition,
-  }));
+  return profiles.flatMap((profile) => {
+    const layout = profileLayout[profile.slug];
+    if (!layout) return [];
+
+    return [
+      {
+        ...profile,
+        position: layout.position,
+        namePosition: layout.namePosition,
+      },
+    ];
+  });
 }
