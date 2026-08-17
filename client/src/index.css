@@ -1,111 +1,245 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Roboto+Condensed:wght@300;400;500;600;700&display=swap");
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+@font-face {
+  font-family: "Ribes";
+  src: url("./assets/fonts/Ribes-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
 }
 
-@media (prefers-color-scheme: dark) {
+@font-face {
+  font-family: "Schroffer Mono";
+  src: url("./assets/fonts/SchrofferMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Schroffer Mono";
+  src: url("./assets/fonts/SchrofferMono-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Schroffer Mono";
+  src: url("./assets/fonts/SchrofferMono-Black.woff2") format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+    color: theme("colors.bird.black");
+    background: theme("colors.bird.white");
+    font-family: theme("fontFamily.body");
+    font-synthesis: none;
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    min-width: 320px;
+    min-height: 100%;
+    background: theme("colors.bird.white");
+  }
+
+  body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+    background-color: theme("colors.bird.white");
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    color: theme("colors.bird.black");
+    background: theme("colors.bird.green");
   }
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
+@layer components {
+  .brand-logo {
+    position:  fixed;
 
-body {
-  margin: 0;
-}
+    left: 50px;
+    bottom: 50px;
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
+    font-family: theme("fontFamily.logo");
+    font-size: clamp(3rem, 8vw, 4rem);
+    line-height: 0.82;
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+    text-decoration: none;
+
+    z-index: 50;
+  }
+
+  .page-shell {
+    min-height: 100vh;
+    padding: clamp(20px, 4vw, 48px);
+  }
+
+  .brand-mark {
+    font-family: theme("fontFamily.logo");
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 0.85;
+    color: theme("colors.bird.blue");
+  }
+
+  .mono-label {
+    font-family: theme("fontFamily.mono");
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .focus-ring {
+    outline: 3px solid transparent;
+    outline-offset: 4px;
+  }
+
+  .focus-ring:focus-visible {
+    outline-color: theme("colors.bird.blue");
+  }
+
+  .ink-button {
+    min-height: 44px;
+    border: 2px solid theme("colors.bird.black");
+    background: theme("colors.bird.white");
+    color: theme("colors.bird.black");
+    box-shadow: 4px 4px 0 theme("colors.bird.black");
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .ink-button:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 theme("colors.bird.black");
+  }
+
+  .ink-button:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 theme("colors.bird.black");
+  }
+
+  .ink-button:disabled {
+    opacity: 0.55;
+    transform: none;
+    box-shadow: 4px 4px 0 theme("colors.bird.black");
+  }
+
+  .ink-input {
+    min-height: 48px;
+    width: 100%;
+    border: 2px solid theme("colors.bird.black");
+    border-radius: 0;
+    background: theme("colors.bird.white");
+    padding: 0.7rem 0.85rem;
+    color: theme("colors.bird.black");
+    box-shadow: inset 3px 3px 0 rgba(10, 10, 10, 0.08);
+  }
+
+  .ink-input:focus {
+    outline: 3px solid theme("colors.bird.green");
+    outline-offset: 2px;
+  }
+
+  .paper-panel {
+    border: 2px solid theme("colors.bird.black");
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 8px 8px 0 theme("colors.bird.black");
+  }
+
+  .avatar-tile {
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+    overflow: hidden;
+    border: 2px solid theme("colors.bird.black");
+    background: theme("colors.bird.yellow");
+    box-shadow: 4px 4px 0 theme("colors.bird.black");
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease,
+      background-color 150ms ease;
+  }
+
+  .avatar-tile:hover,
+  .avatar-tile[data-selected="true"] {
+    transform: translate(-2px, -2px) rotate(-1deg);
+    background: theme("colors.bird.green");
+    box-shadow: 7px 7px 0 theme("colors.bird.blue");
+  }
+
+  .home-link {
+    position: absolute;
+
+    font-family: theme("fontFamily.body");
+    font-size: 1.4rem;
+    font-weight: 400;
+
+    color: theme("colors.bird.blue");
+    text-decoration: none;
+
+    transition: 
+      transform 150ms ease, 
+      color 150ms ease;
+  }
+
+  .home-link:hover {
+    color: theme("colors.bird.pink");
+    transform: scale(1.04);
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+
+.top-left {
+  top: 25%;
+  left: 10%;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.top-right {
+  top: 17%;
+  right: 15%;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.bottom-right {
+  bottom: 24%;
+  right: 12%;
 }

@@ -9,7 +9,10 @@ import "./App.css";
 import { useAuthStore } from "./features/auth/store/authStore";
 import { AuthPage } from "./features/auth/pages/AuthPage";
 import { HomePage } from "./pages/HomePage";
+import { ProfilesPage } from "./features/profiles/pages/ProfilesPage";
+import { MemberProfilePage } from "./features/profiles/pages/MemberProfilePage";
 import { NotFoundPage } from "./pages/NotFoundPage";
+import { LoadingScreen } from "./shared/components/LoadingScreen";
 
 function App() {
   const user = useAuthStore((state) => state.user);
@@ -22,7 +25,7 @@ function App() {
   }, [checkAuth]);
 
   if (isCheckingAuth) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   return (
@@ -36,6 +39,16 @@ function App() {
         <Route
           path="/home"
           element={user ? <HomePage /> : <Navigate to="/auth" replace />}
+        />
+
+        <Route
+          path="/profiles"
+          element={user ? <ProfilesPage /> : <Navigate to="/auth" replace />}
+        />
+
+        <Route
+          path="/profiles/:slug"
+          element={user ? <MemberProfilePage /> : <Navigate to="/auth" replace />}
         />
 
         <Route path="/" element={<Navigate to="/home" replace />} />
