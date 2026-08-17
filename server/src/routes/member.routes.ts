@@ -3,10 +3,11 @@ import {
   getMembers,
   getMemberBySlug,
 } from "../controllers/member.controller.js";
+import { requireAuth } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.get("/", getMembers);
-router.get("/:slug", getMemberBySlug);
+router.get("/", requireAuth, getMembers);
+router.get("/:slug", requireAuth, getMemberBySlug);
 
 export default router;
