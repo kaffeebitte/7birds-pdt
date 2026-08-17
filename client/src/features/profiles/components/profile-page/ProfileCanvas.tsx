@@ -1,5 +1,7 @@
+import type { ReactNode } from "react";
+
 type ProfileCanvasProp = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function ProfileCanvas({ children }: ProfileCanvasProp) {
