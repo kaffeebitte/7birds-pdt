@@ -16,3 +16,10 @@ export type ProfileDetail = {
   spotifyUrl?: string;
   element?: Record<string, unknown>;
 };
+
+export type UpdateProfileInput = {
+  displayName: string;
+  bio: string;
+  instagram: string;
+  spotifyUrl: string;
+};
