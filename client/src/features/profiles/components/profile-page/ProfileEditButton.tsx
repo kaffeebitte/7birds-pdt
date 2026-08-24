@@ -151,8 +151,11 @@ export function ProfileEditButton({ profile }: ProfileEditButtonProps) {
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
-                <label className="mono-label mb-2 block">Display name</label>
+                <label htmlFor="display-name" className="mono-label mb-2 block">
+                  Display name
+                </label>
                 <input
+                  id="display-name"
                   className="ink-input w-full"
                   value={form.displayName}
                   onChange={(e) =>
