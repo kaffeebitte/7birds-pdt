@@ -106,8 +106,20 @@ export function ProfileEditButton({ profile }: ProfileEditButtonProps) {
         setError(null);
         setFormError(null);
       },
-      onError: (error: any) => {
-        setError(error.response?.data?.message || "Unable to update profile");
+      onError: (error: unknown) => {
+        const responseMessage = (error as any)?.response?.data?.message;
+
+        if (typeof responseMessage === "string" && responseMessage.trim()) {
+          setError(responseMessage);
+          return;
+        }
+
+        if (error instanceof Error && error.message) {
+          setError(error.message);
+          return;
+        }
+
+        setError("Unable to update profile");
       },
     });
   }
