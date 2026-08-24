@@ -21,7 +21,7 @@ export async function updateProfile(
   slug: string,
   data: UpdateProfileInput,
 ): Promise<ProfileDetail> {
-  const response = await api.patch(`/members/${slug}`, data);
+  const response = await api.patch<ProfileDetail>(`/members/${slug}`, data);
 
   return response.data;
 }
