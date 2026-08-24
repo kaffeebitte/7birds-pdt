@@ -30,13 +30,21 @@ export function ProfileEditButton({ profile }: ProfileEditButtonProps) {
   });
 
   useEffect(() => {
-    setForm({
-      displayName: profile.displayName,
-      bio: profile.bio ?? "",
-      instagram: profile.instagram ?? "",
-      spotifyUrl: profile.spotifyUrl ?? "",
-    });
-  }, [profile]);
+    if (!isOpen) {
+      setForm({
+        displayName: profile.displayName,
+        bio: profile.bio ?? "",
+        instagram: profile.instagram ?? "",
+        spotifyUrl: profile.spotifyUrl ?? "",
+      });
+    }
+  }, [
+    profile.displayName,
+    profile.bio,
+    profile.instagram,
+    profile.spotifyUrl,
+    isOpen,
+  ]);
 
   function resetForm() {
     setForm({
