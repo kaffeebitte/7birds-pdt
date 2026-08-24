@@ -14,8 +14,8 @@ export function ProfileInstagram({ profile }: ProfileInstagramProps) {
       rel="noopener noreferrer"
       className="
       absolute
-      top-28
-      left-20
+      top-24
+      left-12
       font-serif
       text-3xl
       text-bird-blue

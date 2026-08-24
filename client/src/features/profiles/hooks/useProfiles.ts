@@ -29,6 +29,9 @@ export function useUpdateProfile(slug: string) {
 
     onSuccess: () => {
       queryClient.invalidateQueries({
+        queryKey: ["profiles"],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["profile", slug],
       });
     },

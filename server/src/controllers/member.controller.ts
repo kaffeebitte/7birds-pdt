@@ -108,47 +108,73 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     });
   }
 
-  if (bio !== undefined && bio != null && typeof bio !== "string") {
+  if (bio !== undefined && bio !== null && typeof bio !== "string") {
     return res.status(400).json({
       success: false,
-      message: "Bio must me a string",
+      message: "Bio must be a string",
     });
   }
 
-  if (
-    instagram !== undefined &&
-    instagram !== null &&
-    typeof instagram !== "string"
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Instagram account must be a string",
-    });
+  let normalizedInstagram: string | null = null;
+
+  if (instagram !== undefined) {
+    if (instagram === null) {
+      normalizedInstagram = null;
+    } else {
+      if (typeof instagram !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Instagram account must be a string",
+        });
+      }
+
+      const trimmed = instagram.trim().replace(/^@/, "");
+
+      if (trimmed && !/^[a-zA-Z0-9._]+$/.test(trimmed)) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid Instagram username",
+        });
+      }
+
+      normalizedInstagram = trimmed || null;
+    }
   }
 
-  if (
-    spotifyUrl !== undefined &&
-    spotifyUrl !== null &&
-    typeof spotifyUrl !== "string"
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Spotify URL must be a string",
-    });
+  let normalizedSpotifyUrl: string | null = null;
+
+  if (spotifyUrl !== undefined) {
+    if (spotifyUrl === null) {
+      normalizedSpotifyUrl = null;
+    } else {
+      if (typeof spotifyUrl !== "string") {
+        return res.status(400).json({
+          success: false,
+          message: "Spotify URL must be a string",
+        });
+      }
+
+      normalizedSpotifyUrl = normalizeSpotifyUrl(spotifyUrl);
+
+      if (normalizedSpotifyUrl === null && spotifyUrl.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid Spotify URL",
+        });
+      }
+    }
   }
+
   const data = {
     ...(displayName !== undefined && { displayName: displayName.trim() }),
     ...(bio !== undefined && {
       bio: typeof bio === "string" && bio.trim() ? bio.trim() : null,
     }),
     ...(instagram !== undefined && {
-      instagram:
-        typeof instagram === "string" && instagram.trim()
-          ? instagram.trim().replace(/^@/, "")
-          : null,
+      instagram: normalizedInstagram,
     }),
     ...(spotifyUrl !== undefined && {
-      spotifyUrl: spotifyUrl === null ? null : normalizeSpotifyUrl(spotifyUrl),
+      spotifyUrl: normalizedSpotifyUrl,
     }),
   };
 
@@ -168,21 +194,14 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
 
 function normalizeSpotifyUrl(value: string) {
   const trimmed = value.trim();
+  if (!trimmed) return null;
 
-  if (!trimmed) {
-    return null;
-  }
+  const match = trimmed.match(
+    /^https:\/\/open\.spotify\.com\/(?:embed\/)?(track|album|playlist)\/([^/?#]+)/,
+  );
 
-  if (trimmed.startsWith("https://open.spotify.com/embed/")) {
-    return trimmed;
-  }
+  if (!match) return null;
 
-  if (trimmed.startsWith("https://open.spotify.com/")) {
-    return trimmed.replace(
-      "https://open.spotify.com",
-      "https://open.spotify.com/embed/",
-    );
-  }
-
-  throw new Error("Invalid Spotify URL");
+  const [, type, id] = match;
+  return `https://open.spotify.com/embed/${type}/${id}`;
 }

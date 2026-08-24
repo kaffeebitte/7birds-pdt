@@ -16,7 +16,7 @@ export function ProfileName({ profile }: ProfileNameProps) {
         text-bird-green
         "
     >
-      {`${profile.slug} (${profile.displayName})`}
+      {`${profile.displayName}`}
     </p>
   );
 }

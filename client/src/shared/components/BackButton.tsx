@@ -9,8 +9,8 @@ export function BackButton() {
       type="button"
       onClick={() => navigate(-1)}
       className="absolute
-        top-10
-        left-10
+        top-5
+        left-16
         text-4xl
         cursor-pointer
         -rotate-90

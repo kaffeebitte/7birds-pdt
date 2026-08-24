@@ -93,9 +93,9 @@
 
 @layer components {
   .brand-logo {
-    position:  fixed;
+    position: fixed;
 
-    left: 50px;
+    left: 40px;
     bottom: 50px;
 
     font-family: theme("fontFamily.logo");
@@ -218,8 +218,8 @@
     color: theme("colors.bird.blue");
     text-decoration: none;
 
-    transition: 
-      transform 150ms ease, 
+    transition:
+      transform 150ms ease,
       color 150ms ease;
   }
 
