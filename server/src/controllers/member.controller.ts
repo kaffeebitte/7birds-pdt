@@ -80,7 +80,18 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     });
   }
 
-  const member = await findMemberBySlug(slug);
+  let member;
+
+  try {
+    member = await findMemberBySlug(slug);
+  } catch (error) {
+    console.error("Find member error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load member",
+    });
+  }
 
   if (!member) {
     return res.status(404).json({
