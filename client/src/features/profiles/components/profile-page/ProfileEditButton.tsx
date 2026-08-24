@@ -176,7 +176,7 @@ export function ProfileEditButton({ profile }: ProfileEditButtonProps) {
 
               <div>
                 <label className="mono-label mb-2 block">
-                  Fav song on spotify
+                  Fav song on Spotify
                 </label>
                 <input
                   className="ink-input w-full"
