@@ -40,7 +40,7 @@ export function MemberProfilePage() {
       <ProfileIdentity profile={profile} />
       <ProfileBirthday profile={profile} />
       <ProfileName profile={profile} />
-      {isOwner && <ProfileEditButton />}
+      {isOwner && <ProfileEditButton profile={profile} />}
       <BrandLogo />
     </ProfileCanvas>
   );
