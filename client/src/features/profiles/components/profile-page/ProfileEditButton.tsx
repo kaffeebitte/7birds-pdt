@@ -127,8 +127,15 @@ export function ProfileEditButton({ profile }: ProfileEditButtonProps) {
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="paper-panel w-full max-w-xl p-6">
-            <h2 className="mono-label mb-6">Edit profile</h2>
+          <div
+            className="paper-panel w-full max-w-xl p-6"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="edit-profile-title"
+          >
+            <h2 id="edit-profile-title" className="mono-label mb-6">
+              Edit profile
+            </h2>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div>
