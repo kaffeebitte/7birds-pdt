@@ -194,7 +194,7 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
 
     return res.json(updatedMember);
   } catch (error) {
-    console.log("Update member error:", error);
+    console.error("Update member error:", error);
 
     return res.status(500).json({
       success: false,
