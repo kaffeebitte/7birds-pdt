@@ -1,3 +1,5 @@
+import type { ProfileElement } from "./elements";
+
 export type ProfileSummary = {
   slug: string;
   displayName: string;
@@ -14,7 +16,7 @@ export type ProfileDetail = {
   birthday: string | null;
   instagram: string | null;
   spotifyUrl: string | null;
-  element: Record<string, unknown> | null;
+  elements: ProfileElement[];
 };
 
 export type UpdateProfileInput = {

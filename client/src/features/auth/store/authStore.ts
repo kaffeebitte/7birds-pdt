@@ -33,7 +33,7 @@ function getErrorMessage(error: unknown) {
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  isCheckingAuth: false,
+  isCheckingAuth: Boolean(getStoredToken()),
   isLoggingIn: false,
   loginError: null,
 
