@@ -1,6 +1,6 @@
-import type React from "react";
+import React, { Fragment } from "react";
 import { useRef } from "react";
-import type { ProfileElement } from "../../types/elements";
+import type { ProfileElement, ProfileTextElement } from "../../types/elements";
 
 type ProfileElementsProps = {
   elements: ProfileElement[];
@@ -9,6 +9,7 @@ type ProfileElementsProps = {
   onUpdate: (id: string, updates: Partial<ProfileElement>) => void;
   onDelete: (id: string) => void;
   onEdit: (id: string) => void;
+  onUpdateEnd: (element: ProfileElement) => void;
 };
 
 export function ProfileElements({
@@ -18,6 +19,7 @@ export function ProfileElements({
   onUpdate,
   onDelete,
   onEdit,
+  onUpdateEnd,
 }: ProfileElementsProps) {
   const longPressTimerRef = useRef<number | null>(null);
 
@@ -71,11 +73,22 @@ export function ProfileElements({
       });
     };
 
-    const handlePointerUp = () => {
+    const handlePointerUp = (upEvent: globalThis.PointerEvent) => {
       clearLongPress();
 
       window.removeEventListener("pointermove", handlePointerMove);
       window.removeEventListener("pointerup", handlePointerUp);
+
+      const deltaX = upEvent.clientX - startX;
+      const deltaY = upEvent.clientY - startY;
+
+      const updatedElement = {
+        ...element,
+        x: initialX + deltaX,
+        y: initialY + deltaY,
+      };
+
+      onUpdateEnd(updatedElement);
     };
 
     window.addEventListener("pointermove", handlePointerMove);
@@ -94,6 +107,42 @@ export function ProfileElements({
 
   function handleCanvasPointerDown() {
     onSelect(null);
+  }
+
+  function handleResizePointerDown(
+    event: React.PointerEvent<HTMLDivElement>,
+    element: ProfileTextElement,
+  ) {
+    event.stopPropagation();
+
+    const startX = event.clientX;
+    const initialWidth = element.width;
+
+    const handlePointerMove = (moveEvent: globalThis.PointerEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.min(700, Math.max(100, initialWidth + deltaX));
+
+      onUpdate(element.id, { width: newWidth });
+    };
+
+    const handlePointerUp = (upEvent: globalThis.PointerEvent) => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+
+      const deltaX = upEvent.clientX - startX;
+
+      const newWidth = Math.min(700, Math.max(100, initialWidth + deltaX));
+
+      const updatedElement: ProfileElement = {
+        ...element,
+        width: newWidth,
+      };
+
+      onUpdateEnd(updatedElement);
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
   }
 
   return (
@@ -141,21 +190,36 @@ export function ProfileElements({
 
           if (element.type === "text") {
             return (
-              <div
-                key={element.id}
-                className={`absolute ${selectedElementId === element.id ? "outline outline-2 outline-bird-blue" : ""}`}
-                onPointerDown={(e) => handlePointerDown(e, element)}
-                onContextMenu={(e) => handleContextMenu(e, element)}
-                style={{
-                  left: element.x,
-                  top: element.y,
-                  transform: `rotate(${element.rotation}deg)`,
-                  zIndex: element.zIndex,
-                  touchAction: "none",
-                }}
-              >
-                {element.content}
-              </div>
+              <Fragment key={element.id}>
+                <div
+                  key={element.id}
+                  className={`absolute ${selectedElementId === element.id ? "outline outline-2 outline-bird-blue" : ""}`}
+                  onPointerDown={(e) => handlePointerDown(e, element)}
+                  onContextMenu={(e) => handleContextMenu(e, element)}
+                  style={{
+                    left: element.x,
+                    top: element.y,
+                    width: element.width,
+                    transform: `rotate(${element.rotation}deg)`,
+                    zIndex: element.zIndex,
+                    touchAction: "none",
+                  }}
+                >
+                  {element.content}
+                </div>
+
+                {selectedElementId === element.id && (
+                  <div
+                    className="absolute h-3 w-3 bg-bird-blue cursor-ew-resize"
+                    onPointerDown={(e) => handleResizePointerDown(e, element)}
+                    style={{
+                      left: element.x + element.width - 7,
+                      top: element.y + 10,
+                      zIndex: element.zIndex + 1,
+                    }}
+                  />
+                )}
+              </Fragment>
             );
           }
 

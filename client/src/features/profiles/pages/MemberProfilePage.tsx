@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { BrandLogo } from "../../../shared/components/BrandLogo";
-import { useProfile } from "../hooks/useProfiles";
+import { useProfile, useUpdateProfile } from "../hooks/useProfiles";
 import type { ProfileElement } from "../types/elements";
 import { LoadingScreen } from "../../../shared/components/LoadingScreen";
 import { BackButton } from "../../../shared/components/BackButton";
@@ -20,6 +20,7 @@ export function MemberProfilePage() {
   const { slug } = useParams();
 
   const { data: profile, isLoading, isError } = useProfile(slug ?? "");
+  const updateProfileMutation = useUpdateProfile(slug ?? "");
   const authUser = useAuthStore((state) => state.user);
 
   const [elements, setElements] = useState<ProfileElement[]>([]);
@@ -58,12 +59,24 @@ export function MemberProfilePage() {
       content: "new text",
       x: 400,
       y: 200,
+      width: 250,
       rotation: 0,
       zIndex: elements.length + 1,
     };
 
+    const nextElements = [...elements, newElement];
+
     setElements((prev) => [...prev, newElement]);
     setSelectedElementId(newElement.id);
+    saveElements(nextElements);
+  }
+
+  function handleDeleteElement(id: string) {
+    const nextElements = elements.filter((element) => element.id !== id);
+
+    setElements(nextElements);
+    setSelectedElementId(null);
+    saveElements(nextElements);
   }
 
   function handleEditElement(id: string) {
@@ -88,19 +101,23 @@ export function MemberProfilePage() {
       return;
     }
 
-    setElements((prev) =>
-      prev.map((element) =>
-        element.id === editingElementId && element.type === "text"
-          ? {
-              ...element,
-              content,
-            }
-          : element,
-      ),
+    const nextElements = elements.map((element) =>
+      element.id === selectedElementId && element.type === "text"
+        ? { ...element, content }
+        : element,
     );
+
+    setElements(nextElements);
+    saveElements(nextElements);
 
     setEditingElementId(null);
     setEditingText("");
+  }
+
+  function saveElements(nextElements: ProfileElement[]) {
+    updateProfileMutation.mutate({
+      elements: nextElements,
+    });
   }
 
   return (
@@ -120,10 +137,16 @@ export function MemberProfilePage() {
             ),
           );
         }}
-        onDelete={(id) => {
-          setElements((prev) => prev.filter((element) => element.id !== id));
-        }}
+        onDelete={handleDeleteElement}
         onEdit={handleEditElement}
+        onUpdateEnd={(updatedElement) => {
+          const nextElements = elements.map((element) =>
+            element.id === updatedElement.id ? updatedElement : element,
+          );
+
+          setElements(nextElements);
+          saveElements(nextElements);
+        }}
       />
       {editingElementId && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40">

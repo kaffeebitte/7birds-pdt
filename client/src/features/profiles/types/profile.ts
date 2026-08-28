@@ -20,8 +20,9 @@ export type ProfileDetail = {
 };
 
 export type UpdateProfileInput = {
-  displayName: string;
+  displayName?: string;
   bio?: string | null;
   instagram?: string | null;
   spotifyUrl?: string | null;
+  elements?: ProfileElement[];
 };

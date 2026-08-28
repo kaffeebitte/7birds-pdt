@@ -5,6 +5,11 @@ import {
   findMemberBySlug,
   updateMemberBySlug,
 } from "../services/member.service.js";
+import {
+  isProfileElement,
+  normalizeProfileElements,
+} from "../utils/profile-elements.js";
+import type { ProfileElement } from "../types/profile-elements.js";
 
 export async function getMembers(req: Request, res: Response) {
   try {
@@ -67,7 +72,13 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     });
   }
 
-  const allowedFields = ["displayName", "bio", "instagram", "spotifyUrl"];
+  const allowedFields = [
+    "displayName",
+    "bio",
+    "instagram",
+    "spotifyUrl",
+    "elements",
+  ];
 
   const hasInvalidField = Object.keys(req.body).some(
     (key) => !allowedFields.includes(key),
@@ -107,7 +118,7 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     });
   }
 
-  const { displayName, bio, instagram, spotifyUrl } = req.body;
+  const { displayName, bio, instagram, spotifyUrl, elements } = req.body;
 
   if (
     displayName !== undefined &&
@@ -176,6 +187,30 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     }
   }
 
+  let normalizedElements: ProfileElement[] | undefined;
+
+  if (elements !== undefined) {
+    if (!Array.isArray(elements)) {
+      return res.status(400).json({
+        success: false,
+        message: "Elements must be an array",
+      });
+    }
+
+    const hasInvalidElement = elements.some(
+      (element) => !isProfileElement(element),
+    );
+
+    if (hasInvalidElement) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid profile element",
+      });
+    }
+
+    normalizedElements = normalizeProfileElements(elements);
+  }
+
   const data = {
     ...(displayName !== undefined && { displayName: displayName.trim() }),
     ...(bio !== undefined && {
@@ -186,6 +221,9 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     }),
     ...(spotifyUrl !== undefined && {
       spotifyUrl: normalizedSpotifyUrl,
+    }),
+    ...(normalizedElements !== undefined && {
+      elements: normalizedElements,
     }),
   };
 
