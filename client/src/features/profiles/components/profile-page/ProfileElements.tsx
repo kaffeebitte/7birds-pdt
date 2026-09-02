@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 import { useRef } from "react";
-import type { ProfileElement, ProfileTextElement } from "../../types/elements";
+import type { ProfileElement } from "../../types/elements";
 
 type ProfileElementsProps = {
   elements: ProfileElement[];
@@ -22,6 +22,9 @@ export function ProfileElements({
   onUpdateEnd,
 }: ProfileElementsProps) {
   const longPressTimerRef = useRef<number | null>(null);
+  const selectedElement = elements.find(
+    (element) => element.id === selectedElementId,
+  );
 
   function handleDelete() {
     if (!selectedElementId) {
@@ -111,7 +114,7 @@ export function ProfileElements({
 
   function handleResizePointerDown(
     event: React.PointerEvent<HTMLDivElement>,
-    element: ProfileTextElement,
+    element: ProfileElement,
   ) {
     event.stopPropagation();
 
@@ -153,13 +156,15 @@ export function ProfileElements({
             className="fixed bottom-6 left-1/2 z-[100] flex -translate-x-1/2 gap-2"
             onPointerDown={(e) => e.stopPropagation()}
           >
-            <button
-              type="button"
-              className="ink-button"
-              onClick={() => onEdit(selectedElementId)}
-            >
-              Edit
-            </button>
+            {selectedElement?.type === "text" && (
+              <button
+                type="button"
+                className="ink-button"
+                onClick={() => onEdit(selectedElementId)}
+              >
+                Edit
+              </button>
+            )}
             <button type="button" className="ink-button" onClick={handleDelete}>
               Delete
             </button>
@@ -169,39 +174,59 @@ export function ProfileElements({
         {elements.map((element) => {
           if (element.type === "image") {
             return (
-              <img
+              <div
                 key={element.id}
-                src={element.url}
-                alt=""
-                className={`absolute ${selectedElementId === element.id ? "outline outline-2 outline-bird-blue" : ""}`}
-                onPointerDown={(e) => handlePointerDown(e, element)}
-                onContextMenu={(e) => handleContextMenu(e, element)}
+                className="absolute"
                 style={{
                   left: element.x,
                   top: element.y,
                   width: element.width,
                   transform: `rotate(${element.rotation}deg)`,
                   zIndex: element.zIndex,
-                  touchAction: "none",
                 }}
-              />
+              >
+                <img
+                  src={element.url}
+                  alt=""
+                  className={`block w-full ${selectedElementId === element.id ? "outline outline-2 outline-bird-blue" : ""}`}
+                  onPointerDown={(e) => handlePointerDown(e, element)}
+                  onContextMenu={(e) => handleContextMenu(e, element)}
+                  style={{ touchAction: "none" }}
+                />
+
+                {selectedElementId === element.id && (
+                  <div
+                    className="absolute h-3 w-3 bg-bird-blue cursor-se-resize"
+                    onPointerDown={(e) => handleResizePointerDown(e, element)}
+                    style={{
+                      right: -6,
+                      bottom: -6,
+                      zIndex: element.zIndex + 1,
+                    }}
+                  />
+                )}
+              </div>
             );
           }
 
           if (element.type === "text") {
             return (
-              <Fragment key={element.id}>
+              <div
+                key={element.id}
+                className="absolute"
+                style={{
+                  left: element.x,
+                  top: element.y,
+                  width: element.width,
+                  transform: `rotate(${element.rotation}deg)`,
+                  zIndex: element.zIndex,
+                }}
+              >
                 <div
-                  key={element.id}
-                  className={`absolute ${selectedElementId === element.id ? "outline outline-2 outline-bird-blue" : ""}`}
+                  className={`${selectedElementId === element.id ? "outline outline-2 outline-bird-blue" : ""}`}
                   onPointerDown={(e) => handlePointerDown(e, element)}
                   onContextMenu={(e) => handleContextMenu(e, element)}
                   style={{
-                    left: element.x,
-                    top: element.y,
-                    width: element.width,
-                    transform: `rotate(${element.rotation}deg)`,
-                    zIndex: element.zIndex,
                     touchAction: "none",
                   }}
                 >
@@ -213,13 +238,13 @@ export function ProfileElements({
                     className="absolute h-3 w-3 bg-bird-blue cursor-ew-resize"
                     onPointerDown={(e) => handleResizePointerDown(e, element)}
                     style={{
-                      left: element.x + element.width - 7,
-                      top: element.y + 10,
+                      right: -6,
+                      top: -6,
                       zIndex: element.zIndex + 1,
                     }}
                   />
                 )}
-              </Fragment>
+              </div>
             );
           }
 
