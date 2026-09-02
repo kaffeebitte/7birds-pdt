@@ -1,4 +1,6 @@
 import { prisma } from "../lib/prisma.js";
+import type { ProfileElement } from "../types/profile-elements.js";
+import { normalizeProfileElements } from "../utils/profile-elements.js";
 
 export async function findMembers() {
   const members = await prisma.member.findMany({
@@ -52,7 +54,7 @@ export async function findMemberBySlug(slug: string) {
   return {
     ...rest,
     avatarUrl: rest.avatarUrl ?? user.avatarUrl,
-    element: elements,
+    elements: normalizeProfileElements(elements),
   };
 }
 
@@ -63,6 +65,7 @@ export async function updateMemberBySlug(
     bio?: string | null;
     instagram?: string | null;
     spotifyUrl?: string | null;
+    elements?: ProfileElement[];
   },
 ) {
   const member = await prisma.member.update({
@@ -94,6 +97,6 @@ export async function updateMemberBySlug(
   return {
     ...rest,
     avatarUrl: rest.avatarUrl ?? user.avatarUrl,
-    element: elements,
+    elements: normalizeProfileElements(elements),
   };
 }

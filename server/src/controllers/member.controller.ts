@@ -5,6 +5,16 @@ import {
   findMemberBySlug,
   updateMemberBySlug,
 } from "../services/member.service.js";
+import {
+  isProfileElement,
+  normalizeProfileElements,
+} from "../utils/profile-elements.js";
+import type { ProfileElement } from "../types/profile-elements.js";
+import {
+  uploadProfileImageToCloudinary,
+  deleteProfileImageFromCloudinary,
+} from "../services/cloudinary.service.js";
+import { PROFILE_IMAGE_LIMIT } from "../config/limits.js";
 
 export async function getMembers(req: Request, res: Response) {
   try {
@@ -67,7 +77,13 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     });
   }
 
-  const allowedFields = ["displayName", "bio", "instagram", "spotifyUrl"];
+  const allowedFields = [
+    "displayName",
+    "bio",
+    "instagram",
+    "spotifyUrl",
+    "elements",
+  ];
 
   const hasInvalidField = Object.keys(req.body).some(
     (key) => !allowedFields.includes(key),
@@ -107,7 +123,7 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     });
   }
 
-  const { displayName, bio, instagram, spotifyUrl } = req.body;
+  const { displayName, bio, instagram, spotifyUrl, elements } = req.body;
 
   if (
     displayName !== undefined &&
@@ -176,6 +192,41 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     }
   }
 
+  let normalizedElements: ProfileElement[] | undefined;
+
+  if (elements !== undefined) {
+    if (!Array.isArray(elements)) {
+      return res.status(400).json({
+        success: false,
+        message: "Elements must be an array",
+      });
+    }
+
+    const hasInvalidElement = elements.some(
+      (element) => !isProfileElement(element),
+    );
+
+    if (hasInvalidElement) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid profile element",
+      });
+    }
+
+    normalizedElements = normalizeProfileElements(elements);
+
+    const imageCount = normalizedElements.filter(
+      (element) => element.type === "image",
+    ).length;
+
+    if (imageCount > PROFILE_IMAGE_LIMIT) {
+      return res.status(400).json({
+        success: false,
+        message: `Profile can have at most ${PROFILE_IMAGE_LIMIT} images`,
+      });
+    }
+  }
+
   const data = {
     ...(displayName !== undefined && { displayName: displayName.trim() }),
     ...(bio !== undefined && {
@@ -186,6 +237,9 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
     }),
     ...(spotifyUrl !== undefined && {
       spotifyUrl: normalizedSpotifyUrl,
+    }),
+    ...(normalizedElements !== undefined && {
+      elements: normalizedElements,
     }),
   };
 
@@ -201,6 +255,166 @@ export async function updateMember(req: AuthenticatedRequest, res: Response) {
       message: "Unable to update member",
     });
   }
+}
+
+export async function uploadProfileImage(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  const { slug } = req.params;
+
+  if (typeof slug !== "string" || !slug.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid or missing slug parameter",
+    });
+  }
+
+  if (!req.auth) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication required",
+    });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "Image file is required",
+    });
+  }
+
+  let member;
+
+  try {
+    member = await findMemberBySlug(slug);
+  } catch (error) {
+    console.error("Find member error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to load member",
+    });
+  }
+
+  if (!member) {
+    return res.status(404).json({
+      success: false,
+      message: "Member not found",
+    });
+  }
+
+  if (member.userId !== req.auth.userId) {
+    return res.status(403).json({
+      success: false,
+      message: "You can only edit your own profile",
+    });
+  }
+
+  const imageCount = member.elements.filter(
+    (element) => element.type === "image",
+  ).length;
+
+  if (imageCount >= PROFILE_IMAGE_LIMIT) {
+    return res.status(400).json({
+      success: false,
+      message: "Profile image limit reached",
+    });
+  }
+
+  const result = await uploadProfileImageToCloudinary(req.file.buffer);
+
+  return res.status(200).json({
+    url: result.secure_url,
+    publicId: result.public_id,
+  });
+}
+
+export async function deleteProfileImage(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  const { slug } = req.params;
+  const { publicId } = req.body;
+
+  if (typeof slug !== "string" || !slug.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid or missing slug parameter",
+    });
+  }
+
+  if (!req.auth) {
+    return res.status(401).json({
+      success: false,
+      message: "Authentication required",
+    });
+  }
+
+  if (typeof publicId !== "string" || !publicId.trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "publicId is required",
+    });
+  }
+
+  let member;
+
+  try {
+    member = await findMemberBySlug(slug);
+  } catch (error) {
+    console.error("Find member error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to delete file",
+    });
+  }
+
+  if (!member) {
+    return res.status(404).json({
+      success: false,
+      message: "Member not found",
+    });
+  }
+
+  if (member.userId !== req.auth.userId) {
+    return res.status(403).json({
+      success: false,
+      message: "You can only edit your own profile",
+    });
+  }
+
+  const imageElement = member.elements.find(
+    (element) => element.type === "image" && element.publicId === publicId,
+  );
+
+  if (!imageElement) {
+    return res.status(404).json({
+      success: false,
+      message: "Image not found in profile",
+    });
+  }
+
+  const nextElements = member.elements.filter(
+    (element) => element.id !== imageElement.id,
+  );
+
+  try {
+    await deleteProfileImageFromCloudinary(publicId);
+    await updateMemberBySlug(slug, { elements: nextElements });
+  } catch (error) {
+    console.error("Delete profile image error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to delete image",
+    });
+  }
+
+  return res.status(200).json({
+    success: true,
+  });
 }
 
 function normalizeSpotifyUrl(value: string) {
