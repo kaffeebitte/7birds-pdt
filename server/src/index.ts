@@ -6,6 +6,7 @@ import compression from "compression";
 
 import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import memberRoutes from "./routes/member.routes.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.get("/", (_, res) => {
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/members", memberRoutes);
 
 // Start server
 app.listen(PORT, () => {
