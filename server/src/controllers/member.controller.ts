@@ -396,10 +396,15 @@ export async function deleteProfileImage(
     });
   }
 
+  const nextElements = member.elements.filter(
+    (element) => element.id !== imageElement.id,
+  );
+
   try {
     await deleteProfileImageFromCloudinary(publicId);
+    await updateMemberBySlug(slug, { elements: nextElements });
   } catch (error) {
-    console.error("Delete Cloudinary image fail:", error);
+    console.error("Delete profile image error:", error);
 
     return res.status(500).json({
       success: false,
