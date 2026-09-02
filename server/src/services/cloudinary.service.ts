@@ -42,6 +42,11 @@ export function deleteProfileImageFromCloudinary(
           return;
         }
 
+        if (!result) {
+          reject(new Error("Cloudinary delete failed"));
+          return;
+        }
+
         if (result.result !== "ok" && result.result !== "not found") {
           reject(new Error(`Cloudinary delete failed: ${result.result}`));
           return;
