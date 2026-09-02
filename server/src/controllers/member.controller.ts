@@ -386,7 +386,7 @@ export async function deleteProfileImage(
   }
 
   const imageElement = member.elements.find(
-    (element) => element.type === "image" && element.publicId == publicId,
+    (element) => element.type === "image" && element.publicId === publicId,
   );
 
   if (!imageElement) {
