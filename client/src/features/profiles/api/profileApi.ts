@@ -5,8 +5,6 @@ import type {
   UpdateProfileInput,
 } from "../types/profile";
 import type { UploadProfileImageResponse } from "../types/elements";
-import { data } from "react-router-dom";
-
 export async function getProfiles() {
   const response = await api.get<ProfileSummary[]>("/members");
 
