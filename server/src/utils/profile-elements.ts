@@ -26,7 +26,11 @@ export function isProfileElement(value: unknown): value is ProfileElement {
   }
 
   if (element.type === "image") {
-    return typeof element.url === "string" && typeof element.width === "number";
+    return (
+      typeof element.url === "string" &&
+      typeof element.publicId === "string" &&
+      typeof element.width === "number"
+    );
   }
 
   return false;

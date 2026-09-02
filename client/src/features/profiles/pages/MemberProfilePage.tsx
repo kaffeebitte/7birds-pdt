@@ -1,7 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { BrandLogo } from "../../../shared/components/BrandLogo";
-import { useProfile, useUpdateProfile } from "../hooks/useProfiles";
+import {
+  useProfile,
+  useUpdateProfile,
+  useUploadProfileImage,
+  useDeleteProfileImage,
+} from "../hooks/useProfiles";
+import { validateProfileImage } from "../utils/imageValidation";
 import type { ProfileElement } from "../types/elements";
 import { LoadingScreen } from "../../../shared/components/LoadingScreen";
 import { BackButton } from "../../../shared/components/BackButton";
@@ -15,12 +21,15 @@ import { ProfileElements } from "../components/profile-page/ProfileElements";
 import { ProfileEditButton } from "../components/profile-page/ProfileEditButton";
 import { useAuthStore } from "../../auth/store/authStore";
 import { ElementAddButton } from "../components/profile-page/ElementAddButton";
+import { PROFILE_IMAGE_LIMIT } from "../constants/profileLimits";
 
 export function MemberProfilePage() {
   const { slug } = useParams();
 
   const { data: profile, isLoading, isError } = useProfile(slug ?? "");
   const updateProfileMutation = useUpdateProfile(slug ?? "");
+  const uploadProfileImageMutation = useUploadProfileImage();
+  const deleteProfileImageMutation = useDeleteProfileImage();
   const authUser = useAuthStore((state) => state.user);
 
   const [elements, setElements] = useState<ProfileElement[]>([]);
@@ -29,8 +38,7 @@ export function MemberProfilePage() {
   );
   const [editingElementId, setEditingElementId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
-
-  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     if (profile?.elements) {
@@ -71,8 +79,90 @@ export function MemberProfilePage() {
     saveElements(nextElements);
   }
 
-  function handleDeleteElement(id: string) {
+  async function handleAddImage() {
+    if (uploadProfileImageMutation.isPending) {
+      return;
+    }
+
+    const imageCount = elements.filter(
+      (element) => element.type === "image",
+    ).length;
+
+    if (imageCount >= PROFILE_IMAGE_LIMIT) {
+      return;
+    }
+
+    const input = document.createElement("input");
+
+    input.type = "file";
+    input.accept = "image/jpeg,image/jpg,image/png";
+
+    input.onchange = async () => {
+      const file = input.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      const validationError = validateProfileImage(file);
+
+      if (validationError) {
+        setUploadError(validationError);
+        return;
+      }
+
+      setUploadError(null);
+
+      try {
+        const result = await uploadProfileImageMutation.mutateAsync({
+          slug: slug ?? "",
+          file,
+        });
+
+        const newElement: ProfileElement = {
+          id: crypto.randomUUID(),
+          type: "image",
+          url: result.url,
+          publicId: result.publicId,
+          x: 400,
+          y: 200,
+          width: 250,
+          rotation: 0,
+          zIndex: elements.length + 1,
+        };
+
+        const nextElements = [...elements, newElement];
+
+        setElements(nextElements);
+        setSelectedElementId(newElement.id);
+        saveElements(nextElements);
+      } catch (error) {
+        console.error(error);
+        setUploadError("Unable to upload image");
+      }
+    };
+
+    input.click();
+  }
+
+  async function handleDeleteElement(id: string) {
+    const elementToDelete = elements.find((element) => element.id === id);
+
+    if (!elementToDelete) return;
+
     const nextElements = elements.filter((element) => element.id !== id);
+
+    if (elementToDelete.type === "image") {
+      try {
+        await deleteProfileImageMutation.mutateAsync({
+          slug: slug ?? "",
+          publicId: elementToDelete.publicId,
+        });
+      } catch (error) {
+        console.error(error);
+        return;
+      }
+    }
 
     setElements(nextElements);
     setSelectedElementId(null);
@@ -184,6 +274,18 @@ export function MemberProfilePage() {
         </div>
       )}
 
+      {uploadError && (
+        <div className="fixed top-6 left-1/2 z-[120] -translate-x-1/2 paper-pannel px-4 py-2">
+          {uploadError}
+        </div>
+      )}
+
+      {uploadProfileImageMutation.isPending && (
+        <div className="fixed top-6 left-1/2 z-[120] -translation-x-1/2 paper-pannel px-4 py-2">
+          Uploading image...
+        </div>
+      )}
+
       <ProfileInstagram profile={profile} />
       <ProfileSpotify profile={profile} />
       <ProfileIdentity profile={profile} />
@@ -192,9 +294,8 @@ export function MemberProfilePage() {
       {isOwner && (
         <ElementAddButton
           onAddText={handleAddText}
-          onAddImage={() => {
-            console.log("add image");
-          }}
+          onAddImage={handleAddImage}
+          isUploading={uploadProfileImageMutation.isPending}
         />
       )}
       {isOwner && <ProfileEditButton profile={profile} />}

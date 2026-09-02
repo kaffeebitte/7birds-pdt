@@ -4,6 +4,7 @@ export type ProfileImageElement = {
   id: string;
   type: "image";
   url: string;
+  publicId: string;
   x: number;
   y: number;
   width: number;
@@ -20,4 +21,9 @@ export type ProfileTextElement = {
   width: number;
   rotation: number;
   zIndex: number;
+};
+
+export type UploadProfileImageResponse = {
+  url: string;
+  publicId: string;
 };

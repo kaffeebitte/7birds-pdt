@@ -3,11 +3,13 @@ import { useState } from "react";
 type ElementAddButtonProps = {
   onAddText: () => void;
   onAddImage: () => void;
+  isUploading?: boolean;
 };
 
 export function ElementAddButton({
   onAddText,
   onAddImage,
+  isUploading,
 }: ElementAddButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -28,12 +30,13 @@ export function ElementAddButton({
           <button
             type="button"
             className="ink-button"
+            disabled={isUploading}
             onClick={() => {
               onAddImage();
               setIsOpen(false);
             }}
           >
-            Image
+            {isUploading ? "Uploading..." : "Image"}
           </button>
         </div>
       )}
