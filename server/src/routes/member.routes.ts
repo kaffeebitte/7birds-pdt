@@ -4,10 +4,10 @@ import {
   getMemberBySlug,
   updateMember,
   deleteProfileImage,
+  uploadProfileImage,
 } from "../controllers/member.controller.js";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import { uploadSingleImage } from "../middlewares/upload.middleware.js";
-import { uploadProfileImage } from "../controllers/member.controller.js";
 
 const router = Router();
 
