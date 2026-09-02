@@ -192,7 +192,7 @@ export function MemberProfilePage() {
     }
 
     const nextElements = elements.map((element) =>
-      element.id === selectedElementId && element.type === "text"
+      element.id === editingElementId && element.type === "text"
         ? { ...element, content }
         : element,
     );
