@@ -240,7 +240,7 @@ export function MemberProfilePage() {
       />
       {editingElementId && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40">
-          <div className="paper-pannel w-full max-w-md p-6">
+          <div className="paper-panel w-full max-w-md p-6">
             <h2 className="mono-label mb-6">Edit text</h2>
             <textarea
               className="ink-input w-full"
