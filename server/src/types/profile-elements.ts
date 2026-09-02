@@ -18,7 +18,7 @@ export type ProfileTextElement = {
   content: string;
   x: number;
   y: number;
-  width: number;
+  width?: number;
   rotation: number;
   zIndex: number;
 };
