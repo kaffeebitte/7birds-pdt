@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import type React from "react";
 import { useRef } from "react";
 import type { ProfileElement } from "../../types/elements";
 
