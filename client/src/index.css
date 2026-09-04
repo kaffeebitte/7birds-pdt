@@ -193,7 +193,7 @@
     width: 100%;
     overflow: hidden;
     border: 2px solid theme("colors.bird.black");
-    background: theme("colors.bird.yellow");
+    background: transparent;
     box-shadow: 4px 4px 0 theme("colors.bird.black");
     transition:
       transform 150ms ease,

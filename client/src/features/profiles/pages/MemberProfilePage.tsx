@@ -212,7 +212,6 @@ export function MemberProfilePage() {
 
   return (
     <ProfileCanvas>
-      <BackButton />
 
       <ProfileElements
         elements={elements}
@@ -222,21 +221,21 @@ export function MemberProfilePage() {
           setElements((prev) =>
             prev.map((element) =>
               element.id === id
-                ? ({ ...element, ...updates } as ProfileElement)
-                : element,
-            ),
-          );
-        }}
+          ? ({ ...element, ...updates } as ProfileElement)
+          : element,
+        ),
+      );
+    }}
         onDelete={handleDeleteElement}
         onEdit={handleEditElement}
         onUpdateEnd={(updatedElement) => {
           const nextElements = elements.map((element) =>
             element.id === updatedElement.id ? updatedElement : element,
-          );
-
-          setElements(nextElements);
-          saveElements(nextElements);
-        }}
+        );
+        
+        setElements(nextElements);
+        saveElements(nextElements);
+      }}
       />
       {editingElementId && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/40">
@@ -286,6 +285,7 @@ export function MemberProfilePage() {
         </div>
       )}
 
+      <BackButton />
       <ProfileInstagram profile={profile} />
       <ProfileSpotify profile={profile} />
       <ProfileIdentity profile={profile} />
